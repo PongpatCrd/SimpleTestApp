@@ -1,0 +1,89 @@
+<div class="container">
+  <button type="button" class="btn btn-primary form-control wrapper" data-toggle="modal" data-target="#export_test_status_modal">
+    <i class="fas fa-download"></i> <b>Export Test Detail</b>
+  </button>
+</div>
+
+<form id="export_test_case_card_form" method="POST" action="{% url 'export_test_case_card' %}">
+  {% csrf_token %}
+  <div class="modal fade" id="export_test_status_modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Export Test Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <div class="table-responsive">
+                  <table class="table table-sm">
+                    <thead class=".thead-dark">
+                      <tr style="text-align: center;">
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Export</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for test_detail in test_details %}
+                      <tr>
+                        <td style="text-align: center;">{{ forloop.counter }}</td>
+                        <td>{{ test_detail.test_case_title }}</td>
+                        <td style="text-align: center;">
+                          <i class="fas fa-square" style="cursor: pointer; text-align: center;" onclick="change_status_checkbox('#export_test_test_case_card_id{{ forloop.counter }}', this);"></i>
+                          <input type="checkbox" id="export_test_test_case_card_id{{ forloop.counter }}" name="test_case_card_id" value="{{test_detail.test_case_card_id}}" hidden/>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>Close</b></button>
+          <button type="submit" class="btn btn-primary"><b>Download</b></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+  function change_status_checkbox(element_input_id, element_icon_id){
+    if($(element_icon_id).attr("class") == "fas fa-square"){
+      $(element_icon_id).attr("class", "fas fa-check-square");
+      $(element_input_id).prop('checked', true);
+    }
+    else{
+      $(element_icon_id).attr("class", "fas fa-square");
+      $(element_input_id).prop('checked', false);
+    }
+  }
+</script>
+
+<script>
+  $("#export_test_case_card_form").on('submit', function(){
+    $("#export_test_status_modal").modal('hide');
+  });
+</script>
+
+<script>
+  $("#export_test_status_modal").on("shown.bs.modal", function(){
+    $("#export_test_case_card_form i").each(function(){
+      $(this).attr('class', "fas fa-square");
+    });
+
+    $("#export_test_case_card_form input").each(function(){
+      $(this).prop('checked', false);
+    });
+  });
+</script>

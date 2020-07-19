@@ -1,0 +1,92 @@
+<!-- Modal -->
+<div class="modal fade" id="modal_project_detail_select" tabindex="-1" role="dialog" data-backdrop="static">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><b>PROJECT SETTING</b></h3>
+      </div>
+      <div class="modal-body">
+        <div class="container">
+          <form id="modal_project_detail_select_form" method="GET" action=".">
+            <div class="row">
+              <div class="col-auto">
+                <h5 style="margin-top: 7px;"><b>Project&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</b></h5>
+              </div>
+              <div class="col">
+                <select id="project_selector" name="project_selector" class="form-control" style="width: 100%;" required>
+                  {% for project in projects %}
+                  <option value="{{project.id}}">{{project.title}}</option>
+                  {% endfor %}
+                </select>
+                <script>make_select_searchable("#project_selector");</script>
+                {% if current_project_id %}
+                <script>$("#project_selector").val('{{current_project_id}}').change();</script>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="row" style="margin-top: 15px;">
+              <div class="col-auto">
+                <h5 style="margin-top: 7px;"><b>Environment</b></h5>
+              </div>
+              <div class="col">
+                <select id="environment_selector" name="environment_selector" class="form-control" style="width: 100%;" required>
+                  <option value="please_select" selected disabled>Please Select</option>
+                  {% for environment in environments%}
+                  <option value="{{environment.id}}">{{ environment.title }}</option>
+                  {% endfor %}
+                </select>
+                <script>make_select_searchable("#environment_selector");</script>
+                {% if current_environment_id %}
+                <script>$("#environment_selector").val('{{current_environment_id}}').change();</script>
+                {% endif %}
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="modal_project_detail_select_form_submit_btn" type="button" class="btn btn-primary form-control" hidden><b>GO</b></button>
+        <script>
+          $("#environment_selector").on('change', function(){
+            $("#modal_project_detail_select_form_submit_btn").prop('hidden', false);
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+    let check_project_selected = $("#project_selector").find('option:selected');
+    let check_element_selected = $("#element_selector").find('option:selected');
+
+    if(typeof check_project_selected.val() === 'undefined' || typeof check_element_selected.val() === 'undefined'){
+      $("#modal_project_detail_select").modal('show');
+    }
+  });
+
+  $("#modal_project_detail_select_form_submit_btn").on('click', function(e){
+    e.preventDefault();
+    loading_screen(true);
+    $("#modal_project_detail_select").modal('hide');
+    $.ajax({
+      type: 'GET',
+      url: "{% url 'index_test_script_detail_select_html' %}",
+      dataType: 'json',
+      data: {
+        project_selector    : $("#project_selector").val(),
+        environment_selector: $("#environment_selector").val(),
+      },
+      success: function(response){
+        $("#index_test_script_detail_select_html").html(response.index_test_script_detail_select_html);
+        loading_screen(false);
+      },
+      error: function(){
+        $("#index_content").html("<h4>Oops! Something went wrong, Please refresh the page and try again.</h4>");
+        loading_screen(false);
+      }
+    });
+  });
+</script>

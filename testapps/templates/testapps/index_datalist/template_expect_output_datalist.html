@@ -1,0 +1,6 @@
+<datalist id="{{datalist_id}}">
+  <option value="-1">Other</option>
+  {% for data in datas %}
+  <option value="{{data.id}}">{{data.expect_output}}</option>
+  {% endfor %}
+</datalist>

@@ -1,0 +1,172 @@
+{% load static %}
+<head>
+  <!-- jquery -->
+  <script src="{% static 'jquery-3.5.1/jquery-3.5.1.min.js' %}"></script>
+
+  <!-- fontawsome -->
+  <link href="{% static 'fontawesome-free-5.13.0-web/css/all.css' %}" rel="stylesheet"/>
+
+  <!-- bootstrap -->
+  <link href="{% static 'bootstrap-4.1.3-dist/css/bootstrap.css' %}" rel="stylesheet"/>
+  <script src="{% static 'bootstrap-4.1.3-dist/js/bootstrap.min.js' %}"></script>
+
+  <!-- select2 -->
+  <link href="{% static 'select2-4.0.13/css/select2.min.css' %}" rel="stylesheet"/>
+  <script src="{% static 'select2-4.0.13/js/select2.min.js' %}"></script>
+  <link href="{% static 'select2-bootstrap4-theme/dist/select2-bootstrap4.css' %}" rel="stylesheet"/>
+
+  <!-- custom -->
+  <script src="{% static 'custom-js/testapp_helper.js' %}"></script>
+  <script>
+    String.prototype.format = String.prototype.f = function() {
+      var s = this,
+          i = arguments.length;
+
+      while (i--) {
+          s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);
+      }
+      return s;
+    };
+
+    function createUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+      });
+    }
+
+    function loading_screen(is_turn_on){
+      if(is_turn_on){
+        $(".loading-warpper").show();
+      }
+      else{
+        $(".loading-warpper").hide();
+      }
+    }
+    function make_select_searchable(element_id){
+      $(element_id).select2({theme: "bootstrap4", closeOnSelect: true});
+    }
+  </script>
+
+  <style>
+    html,
+    body{
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      background: #eaecfa;
+    }
+
+    .loader {
+      width: 250px;
+      height: 50px;
+      line-height: 50px;
+      text-align: center;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+              transform: translate(-50%, -50%);
+      font-family: helvetica, arial, sans-serif;
+      text-transform: uppercase;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: 0.2em;
+    }
+    .loader::before, .loader::after {
+      content: "";
+      display: block;
+      width: 15px;
+      height: 15px;
+      background: #ffffff;
+      position: absolute;
+      -webkit-animation: load .7s infinite alternate ease-in-out;
+              animation: load .7s infinite alternate ease-in-out;
+    }
+    .loader::before {
+      top: 0;
+    }
+    .loader::after {
+      bottom: 0;
+    }
+
+    @-webkit-keyframes load {
+      0% {
+        left: 0;
+        height: 30px;
+        width: 15px;
+      }
+      50% {
+        height: 8px;
+        width: 40px;
+      }
+      100% {
+        left: 235px;
+        height: 30px;
+        width: 15px;
+      }
+    }
+
+    @keyframes load {
+      0% {
+        left: 0;
+        height: 30px;
+        width: 15px;
+      }
+      50% {
+        height: 8px;
+        width: 40px;
+      }
+      100% {
+        left: 235px;
+        height: 30px;
+        width: 15px;
+      }
+    }
+
+    .test {
+      border: 1px solid red;
+    }
+    .testt {
+      border: 1px solid black;
+    }
+
+    .loading-warpper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      z-index: 9999;
+      position: fixed;
+      margin-left: auto;
+      margin-right: auto;
+      left: 0;
+      right: 0;
+      margin-top: auto;
+      margin-bottom: auto;
+      top: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.7);
+    }
+    textarea {
+      resize: none;
+      width: 100%;
+      padding: 5px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<div class="loading-warpper">
+  <div class="loader">Loading...</div>
+</div>
+<script>
+  $(document).ready(function(){
+    loading_screen(false);
+  });
+</script>
+{% include 'testapps/modal_confirm_delete.html' %}

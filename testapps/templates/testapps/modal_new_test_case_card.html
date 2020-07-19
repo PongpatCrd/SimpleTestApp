@@ -1,0 +1,62 @@
+<div class="container">
+  <button type="button" class="btn btn-warning btn fas fa-plus-square form-control wrapper" data-toggle="modal" data-target="#new_test_case_card_modal">
+    <b>New Test Case</b>
+  </button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="new_test_case_card_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">NEW TEST CASE</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="new_test_case_card_form" method="POST" action="." autocomplete="off">
+        {% csrf_token %}
+        <div class="modal-body" style="text-align: center;">
+          <h5><b>Test Case Name</b></h5>
+        <input class="form-control wrapper" id="test_case_card_title" name="test_case_card_title" value="" type="text" placeholder="New Test Case Name.." style="margin-top: 7px;"/>
+        <input name="test_script_detail_id" value="{{current_test_script_detail_id}}" hidden/>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>Close</b></button>
+          <button id="new_test_case_card_submit_btn" type="submit" class="btn btn-warning" hidden><b>Save</b></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  $("#new_test_case_card_form").on('submit', function(e){
+    e.preventDefault();
+    loading_screen(true);
+    $("#new_test_case_card_modal").modal('hide');
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'create_test_case_card' %}",
+      dataType: 'json' ,
+      data: $("#new_test_case_card_form").serialize(),
+      success: function(response){
+        $("#test_case_card_html").html(response.test_case_card_html);
+        loading_screen(false);
+      },
+      error: function(){
+        $("#index_content").html("<h4>Oops! Something went wrong, Please refresh the page and try again.</h4>");
+        loading_screen(false);
+      }
+    });
+  });
+
+  $("#test_case_card_title").on('input', function(){
+    if(this.value.length > 0){
+      $("#new_test_case_card_submit_btn").prop('hidden', false);
+    }
+    else{
+      $("#new_test_case_card_submit_btn").prop('hidden', true);
+    }
+  });
+</script>

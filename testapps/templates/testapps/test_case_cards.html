@@ -1,0 +1,365 @@
+<script>
+  var uuid;
+</script>
+
+<div id="modal_export_test_case_cards">
+  {% if current_test_script_detail_id %}
+  <div style="margin-bottom: 15px;">
+  {% include 'testapps/modal_export_test_case_cards.html' %}
+  </div>
+  {% endif %}
+</div>
+
+<datalist id="module_detail_options">
+  <option value="-1">Create New</option>
+  {% for module_detail in module_details %}
+  <option value="{{module_detail.id}}">{{module_detail.title}}</option>
+  {% endfor %}
+</datalist>
+
+<datalist id="status_detail_options">
+  {% for status_detail in status_details %}
+  <option value="{{status_detail.id}}">{{status_detail.title}}</option>
+  {% endfor %}
+</datalist>
+
+<datalist id="tester_options">
+  <option value="please_select" selected disabled>Please select</option>
+  <option value="-1">Create New</option>
+  {% for tester in testers %}
+  <option value="{{tester.id}}">{{tester.title}}</option>
+  {% endfor %}
+</datalist>
+
+<datalist id="os_and_device_detail_options">
+  <option value="please_select" selected disabled>Please select</option>
+  <option value="-1">Create New</option>
+  {% for os_and_device_detail in os_and_device_details %}
+  <option value="{{os_and_device_detail.id}}">{{os_and_device_detail.title}}</option>
+  {% endfor %}
+</datalist>
+
+{% for test_detail in test_details %}
+{% if forloop.counter > 1 %}
+<div id="test_case_card{{forloop.counter}}" class="card" style="margin-top: 25px;">
+  {% else %}
+  <div id="test_case_card{{forloop.counter}}" class="card">
+    {% endif %}
+    <div class="card-header" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}"
+      style="cursor: pointer;">
+      <h5><b>{{test_detail.test_case_title}}</b></h5>
+    </div>
+    <div class="card-header">
+      {% if test_detail.n_test_cases_passed != test_detail.test_case_card_details|length %}
+      <h5 style="text-align: center; color: red;">
+        {% else %}
+        <h5 style="text-align: center; color: greenyellow;">
+          {% endif %}
+          {{test_detail.n_test_cases_passed}}/{{test_detail.test_case_card_details|length}} is Passed
+        </h5>
+        <script>
+          $("#delete_test_case_card_btn{{forloop.counter}}").on('click', function () {
+            loading_screen(true);
+            $.ajax({
+              type: 'POST',
+              url: "{% url 'delete_test_case_card' %}",
+              dataType: 'json',
+              data: {
+                test_case_card_id: "{{test_detail.test_case_card_id}}",
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              success: function () {
+                loading_screen(false);
+              },
+              error: function () {
+                $("#index_content").html("<h4>Oops! Something went wrong, Please refresh the page and try again.</h4>");
+                loading_screen(false);
+              }
+            });
+          });
+        </script>
+    </div>
+    <div id="collapse{{ forloop.counter }}" class="collapse hide">
+      <div class="card-body">
+        <div style="overflow-x:auto;">
+          <form id="test_case_card_details_form{{ forloop.counter }}" action="." method="POST" autocomplete="off">
+            {% csrf_token %}
+            <div id="test_case_card_detail_container{{ forloop.counter }}">
+              <div id="test_case_card_detail_container{{ forloop.counter }}_delete_ids" hidden></div>
+              <div id="test_case_card_detail_container{{ forloop.counter }}_delete_img_ids" hidden></div>
+              {% for test_case_card_detail in test_detail.test_case_card_details %}
+              <div class="container">
+
+                <div class="row">
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Module</b></h7>
+                      <select id="module_choose{{forloop.parentloop.counter}}{{forloop.counter}}" name="module_choose"
+                        class="form-control wrapper" style="width: 100%;"></select>
+                      <script>
+                        $("#module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").html($("#module_detail_options").html());
+                      </script>
+                      <script>
+                        make_select_searchable("#module_choose{{forloop.parentloop.counter}}{{forloop.counter}}");
+                      </script>
+                      <input placeholder="type something.." class="form-control wrapper" class="form-control wrapper"
+                        id="new_module_choose{{forloop.parentloop.counter}}{{forloop.counter}}" name="new_module_choose"
+                        value="" type="text" hidden />
+                      <script>
+                        $("#module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").on("change.select2 change", function (e) {
+                          if ($("#module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").val() == "-1") {
+                            $("#new_module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").prop("hidden", false);
+                          }
+                          else {
+                            $("#new_module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").prop("hidden", true);
+                            $("#new_module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").val("");
+                          }
+                        });
+                      </script>
+                      <script>
+                        if ($("#module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").val() == "-1") {
+                          $("#new_module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").prop("hidden", false);
+                        }
+                        else {
+                          $("#new_module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").prop("hidden", true);
+                          $("#new_module_choose{{forloop.parentloop.counter}}{{forloop.counter}}").val("");
+                        }
+                      </script>
+                    </div>
+                  </div>
+                  <script>
+                    set_select2_val("#module_choose{{forloop.parentloop.counter}}{{forloop.counter}}", "{{test_case_card_detail.module_detail_id}}");
+                  </script>
+
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Test Case Code</b></h7>
+                      <input placeholder="type something.." class="form-control wrapper"
+                        id="test_case_code{{forloop.parentloop.counter}}{{forloop.counter}}" name="test_case_code"
+                        style="width: 100%;" value="{{test_case_card_detail.code}}" type="text" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Test Description</b></h7>
+                      <textarea placeholder="type something.." class="form-control wrapper"
+                        id="test_case_desc{{forloop.parentloop.counter}}{{forloop.counter}}" name="test_case_desc"
+                        style="width: 100%;" type="text"
+                        oninput="show_all_textarea(this);">{{test_case_card_detail.description}}</textarea>
+                      <script>
+                        show_all_textarea("#test_case_desc{{forloop.parentloop.counter}}{{forloop.counter}}");
+                      </script>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Expected Result</b></h7>
+                      <textarea placeholder="type something.." class="form-control wrapper"
+                        id="test_case_output{{forloop.parentloop.counter}}{{forloop.counter}}" name="test_case_output"
+                        style="width: 100%;" type="text"
+                        oninput="show_all_textarea(this);">{{test_case_card_detail.expect_output}}</textarea>
+                      <script>
+                        show_all_textarea("#test_case_output{{forloop.parentloop.counter}}{{forloop.counter}}");
+                      </script>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Test Steps</b></h7>
+                      <textarea placeholder="type something.." class="form-control wrapper"
+                        id="test_case_step{{forloop.parentloop.counter}}{{forloop.counter}}" name="test_case_step"
+                        style="width: 100%;" type="text"
+                        oninput="show_all_textarea(this);">{{test_case_card_detail.test_step}}</textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Remark</b></h7>
+                      <textarea placeholder="type something.." class="form-control wrapper"
+                        id="test_case_remark{{forloop.parentloop.counter}}{{forloop.counter}}" name="test_case_remark"
+                        style="width: 100%;" type="text"
+                        oninput="show_all_textarea(this);">{{test_case_card_detail.remark}}</textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Test Status</b></h7>
+                      <select id="status_detail_choose{{forloop.parentloop.counter}}{{forloop.counter}}"
+                        name="status_detail_choose" class="form-control wrapper" style="width: 100%;"></select>
+                      <script>
+                        $("#status_detail_choose{{forloop.parentloop.counter}}{{forloop.counter}}").html($("#status_detail_options").html());
+                      </script>
+                    </div>
+                  </div>
+                  <script>
+                    set_value("#status_detail_choose{{forloop.parentloop.counter}}{{forloop.counter}}", "{{test_case_card_detail.status_detail_id}}");
+                  </script>
+
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Last Updated</b></h7>
+                      <input class="form-control wrapper"
+                        id="last_update_time{{forloop.parentloop.counter}}{{forloop.counter}}" name="last_update_time"
+                        class="form-control wrapper" style="width: 100%; display: inline-block;" readonly />
+                      <script>
+                        $(".{{forloop.parentloop.counter}}{{forloop.counter}}").on("change", function (e) {
+                          $("#last_update_time{{forloop.parentloop.counter}}{{forloop.counter}}").val(get_timestamp);
+                        });
+                      </script>
+                    </div>
+                  </div>
+                  <script>
+                    set_value("#last_update_time{{forloop.parentloop.counter}}{{forloop.counter}}", "{{test_case_card_detail.updated_at}}");
+                  </script>
+
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Tester</b></h7>
+                      <input class="form-control wrapper" id="tester{{forloop.parentloop.counter}}{{forloop.counter}}"
+                        class="form-control wrapper" style="width: 100%;" readonly />
+                      <h7><b>Device/OS</b></h7>
+                      <input class="form-control wrapper"
+                        id="os_and_device_detail{{forloop.parentloop.counter}}{{forloop.counter}}"
+                        class="form-control wrapper" style="width: 100%;" readonly />
+                    </div>
+                  </div>
+                </div>
+                <script>
+                  copy_option_inner_html_by_value_to_element('#tester_options', "{{test_case_card_detail.tester_id}}", "#tester{{forloop.parentloop.counter}}{{forloop.counter}}");
+                  copy_option_inner_html_by_value_to_element('#os_and_device_detail_options', "{{test_case_card_detail.os_and_device_detail_id}}", "#os_and_device_detail{{forloop.parentloop.counter}}{{forloop.counter}}");
+                </script>
+
+                <div class="row">
+                  <div class="col">
+                    <div class="{{forloop.parentloop.counter}}{{forloop.counter}}">
+                      <h7><b>Attachments</b></h7><i class="fas fa-plus-circle"
+                        style="cursor: pointer; margin-left: 7px; color: green;"
+                        onclick="add_file_input('#attach_file_container{{forloop.parentloop.counter}}{{forloop.counter}}', 'attach_file{{test_case_card_detail.id}}');"></i>
+                      <div id="attach_file_container{{forloop.parentloop.counter}}{{forloop.counter}}">
+                        {% for detail in test_case_card_detail.test_case_card_detail_imgs %}
+                        <div style="margin-top: 10px;">
+                          <img src="{{detail.photo.url}}" style="height: 128px; width: 128px;">
+                          <i class="fas fa-minus-circle" style="color: red; cursor: pointer;"
+                            onclick="delete_confirm_plug_element_onclick($(this).parent().find('button'));"></i>
+                          <button type="button"
+                            onclick="$(this).change(); copy_input_delete_img_id_to_div('#test_case_card_detail_container{{ forloop.parentloop.parentloop.counter }}_delete_img_ids', '{{detail.id}}'); $(this).parent().remove();"
+                            hidden></button>
+                        </div>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col" style="text-align: center; margin-top:10px;">
+                    <input id="test_case_card_detail_id{{forloop.parentloop.counter}}{{forloop.counter}}"
+                      name="test_case_card_detail_id" type="text"
+                      value="{{forloop.parentloop.counter}}{{forloop.counter}}" hidden />
+                    <button id="delete_item_btn{{forloop.parentloop.counter}}{{forloop.counter}}"
+                      onclick="copy_input_delete_id_to_div('#test_case_card_detail_container{{ forloop.parentloop.counter }}', '#test_case_card_detail_id{{forloop.parentloop.counter}}{{forloop.counter}}'); $(this).parent().parent().parent().remove();"
+                      hidden></button>
+                    <button type="button" class="btn btn-danger btn-sm" style="width: 60%;"
+                      onclick="delete_confirm_plug_element_onclick('#delete_item_btn{{forloop.parentloop.counter}}{{forloop.counter}}')"><b>Remove</b></button>
+                    <hr>
+                  </div>
+                </div>
+                <script>
+                  set_value("#test_case_card_detail_id{{forloop.parentloop.counter}}{{forloop.counter}}", "{{test_case_card_detail.id}}");
+                </script>
+
+              </div>
+              {% endfor %}
+            </div>
+            <input id="test_case_card_id{{ forloop.counter }}" name="test_case_card_id"
+              value="{{test_detail.test_case_card_id}}" hidden />
+          </form>
+        </div>
+        <button id="delete_test_case_card_btn{{forloop.counter}}"
+          onclick="$('#test_case_card{{forloop.counter}}').remove();" hidden></button>
+        <button class="btn btn-danger btn-sm fas fa-trash-alt" style="width: 100%;"
+          onclick="delete_confirm_plug_element_onclick('#delete_test_case_card_btn{{forloop.counter}}');">
+          <b>Delete</b></button>
+        <button id="add_more_btn_test_case_card_detail{{forloop.counter}}"
+          class="btn btn-primary btn-sm fas fa-plus-square"
+          onclick="append_test_case_card_detail_to_element('#test_case_card_detail_container{{ forloop.counter }}', createUUID());"
+          style="width: 100%; margin-top: 5px;"> <b>Add More</b></button>
+        <button id="save_card{{ forloop.counter }}" class="btn btn-success btn-sm fas fa-save"
+          style="width: 100%; margin-top: 5px;"> <b>Save</b></button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $("#save_card{{ forloop.counter }}").on('click', function () {
+      $("#modal_test_case_card_additional_detail_submit_btn").click(function () {
+        $("#test_case_card_details_form{{ forloop.counter }}").submit();
+      });
+      $("#modal_test_case_additional_detail").modal('show');
+    });
+
+    $("#test_case_card_details_form{{ forloop.counter }}").on('submit', function (e) {
+      e.preventDefault();
+      loading_screen(true);
+
+      var form_data = new FormData(this);
+      form_data.append('tester_choose', $("#test_case_additional_detail_form #tester_choose").val());
+      form_data.append('new_tester_choose', $("#test_case_additional_detail_form #new_tester_choose").val());
+
+      form_data.append('os_and_device_detail_choose', $("#test_case_additional_detail_form #os_and_device_detail_choose").val());
+      form_data.append('new_os_and_device_detail_choose', $("#test_case_additional_detail_form #new_os_and_device_detail_choose").val());
+
+      form_data.append('test_script_detail_id', "{{current_test_script_detail_id}}");
+
+      $.ajax({
+        type: 'POST',
+        url: "{% url 'update_test_case_card_details' %}",
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+          $("#test_case_card_html").html(response.test_case_card_html).change();
+          $('html, body').animate({scrollTop: '0px'}, 300);
+          loading_screen(false);
+        },
+        error: function () {
+          $("#index_content").html("<h4>Oops! Something went wrong, Please refresh the page and try again.</h4>");
+          loading_screen(false);
+        }
+      });
+    });
+  </script>
+
+  <script>
+    $("#collapse{{ forloop.counter }}").on('shown.bs.collapse', function () {
+      $("#collapse{{ forloop.counter }} textarea").each(function () {
+        $(this).trigger('input');
+      });
+    });
+  </script>
+  {% endfor %}
+
+  <div id="modal_new_test_case_card">
+    {% if current_test_script_detail_id %}
+    <hr style="width: 90%;">
+    {% include 'testapps/modal_new_test_case_card.html' %}
+    {% endif %}
+  </div>
+
+  {% include 'testapps/modal_test_case_card_additional_detail.html' %}

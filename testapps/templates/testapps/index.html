@@ -1,0 +1,23 @@
+{% extends 'main_layout.html' %}
+{% block content %}
+<div id="index_content" style="margin-top: 30px; margin-bottom: 50px;">
+  <div id="modal_project_detail_select_html">
+    {% include 'testapps/modal_project_detail_select.html' %}
+  </div>
+
+  <div id="index_test_script_detail_select_html">
+    {% include 'testapps/index_test_script_detail_select.html' %}
+  </div>
+
+  <div id="test_case_card_html">
+
+  </div>
+  <div id="export_test_case_template" style="display: none;">
+    <i class="fas fa-backspace fa-3x" style="cursor: pointer;" onclick="$('#test_case_card_html').show(); $('#export_test_case_template').hide();"></i>
+    <div id="export_test_case_template_content">
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

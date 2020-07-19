@@ -1,0 +1,4 @@
+testapps/static/* linguist-vendored
+testapps/templates/* linguist-vendored
+templates/* linguist-vendored
+static/* linguist-vendored

@@ -1,0 +1,66 @@
+<!-- Modal -->
+<div class="modal fade" id="modal_test_case_additional_detail" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Additional Detail</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <form id="test_case_additional_detail_form">
+          <h5><b>Tester</b></h5>
+          <select id="tester_choose" name="tester_choose" class="form-control wrapper" style="width: 100%;"></select>
+          <script>$("#tester_choose").html($("#tester_options").html());</script>
+          <script>make_select_searchable("#tester_choose");</script>
+          <input class="form-control wrapper" id="new_tester_choose" name="new_tester_choose" value="" type="text" style="width: 100%; margin-top: 5px;" hidden/>
+          <script>$("#tester_choose").on("change", function(e){ if($("#tester_choose").val() == "-1"){ $("#new_tester_choose").prop("hidden", false); } else{$("#new_tester_choose").prop("hidden", true); $("#new_tester_choose").val("");}});</script>
+          <script>
+            if($("#tester_choose").val() == "-1"){
+              $("#new_tester_choose").prop("hidden", false);
+            }
+            else{
+              $("#new_tester_choose").prop("hidden", true);
+              $("#new_tester_choose").val("");
+            }
+          </script>
+
+          <h5><b>OS/Device</b></h5>
+          <select id="os_and_device_detail_choose" name="os_and_device_detail_choose" class="form-control wrapper" style="width: 100%;"></select>
+          <script>$("#os_and_device_detail_choose").html($("#os_and_device_detail_options").html());</script>
+          <script>make_select_searchable("#os_and_device_detail_choose");</script>
+          <input class="form-control wrapper" id="new_os_and_device_detail_choose" name="new_os_and_device_detail_choose" value="" type="text" style="width: 100%; margin-top: 5px;" hidden/>
+          <script>$("#os_and_device_detail_choose").on("change", function(e){ if($("#os_and_device_detail_choose").val() == "-1"){ $("#new_os_and_device_detail_choose").prop("hidden", false); } else{$("#new_os_and_device_detail_choose").prop("hidden", true); $("#new_os_and_device_detail_choose").val("");}});</script>
+          <script>
+            if($("#os_and_device_detail_choose").val() == "-1"){
+              $("#new_os_and_device_detail_choose").prop("hidden", false);
+            }
+            else{
+              $("#new_os_and_device_detail_choose").prop("hidden", true);
+              $("#new_os_and_device_detail_choose").val("");
+            }
+          </script>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><b>Close</b></button>
+        <button id="modal_test_case_card_additional_detail_submit_btn" type="button" data-dismiss="modal" class="btn btn-success" hidden><b>Save changes</b></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $("#tester_choose").on('change', function(){
+    if($("#tester_choose").val() != null && $("#os_and_device_detail_choose").val() != null){
+      $("#modal_test_case_card_additional_detail_submit_btn").prop('hidden', false);
+    }
+  });
+
+  $("#os_and_device_detail_choose").on('change', function(){
+    if($("#tester_choose").val() != null && $("#os_and_device_detail_choose").val() != null){
+      $("#modal_test_case_card_additional_detail_submit_btn").prop('hidden', false);
+    }
+  });
+</script>

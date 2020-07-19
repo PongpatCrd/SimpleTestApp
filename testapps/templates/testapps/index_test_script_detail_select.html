@@ -1,0 +1,103 @@
+<div class="container">
+  <div class="row">
+    <div class="col" style="text-align: center;">
+      <h5><b>Test Script</b></h5>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">
+      <div style="width: 70%; margin:0 auto;">
+        <form id="test_script_detail_select_form" method="POST" autocomplete="off">
+          {% csrf_token %}
+          <select id="test_script_detail_choose" name="test_script_detail_choose" class="form-control" style="width: 100%;">
+            <option value="please_select" selected disabled>Please Select</option>
+            <option value="-1">Create New</option>
+            {% for test_script_detail in test_script_details %} 
+            <option value="{{test_script_detail.id}}">{{test_script_detail.title}}</option>
+            {% endfor %}
+          </select>
+          <script>make_select_searchable("#test_script_detail_choose");</script>
+          <input class="form-control wrapper" id="new_test_script_detail_choose" name="new_test_script_detail_choose" value="" type="text" placeholder="New Test Script Name.." style="margin-top: 7px;" hidden/>
+          {% if current_test_script_detail_id %}
+          <script>set_select2_val("#test_script_detail_choose", "{{current_test_script_detail_id}}");</script>
+          {% endif %}
+          <div style="text-align: center;">
+            <button type="button" id="test_script_detail_select_form_submit_btn" class="btn btn-success" style="margin-top: 7px; width: 50%;" hidden>Create New</button>
+            <button type="button" id="plug_delete_test_script_function" hidden></button>
+            <button type="button" id="btn_delete_test_script" class="btn btn-danger" style="margin-top: 7px; width: 50%;" onclick="delete_confirm_plug_element_onclick('#plug_delete_test_script_function');" hidden><b>Delete</b></button>
+          </div>
+        </form>
+        <script>
+          $("#test_script_detail_choose").on("change", function(e){
+            if($("#test_script_detail_choose").val() == "-1"){
+              $("#new_test_script_detail_choose").prop("hidden", false);
+              $("#test_script_detail_select_form_submit_btn").prop("hidden", false);
+              $('#test_script_detail_select_form_submit_btn').html('<b>Create New</b>');
+              $('#test_script_detail_select_form_submit_btn').attr('class', 'btn btn-success');
+              $('#btn_delete_test_script').prop("hidden", true);
+            }
+            else{
+              $("#new_test_script_detail_choose").prop("hidden", true);
+              $("#new_test_script_detail_choose").val("");
+              $("#test_script_detail_select_form_submit_btn").prop("hidden", false);
+              $('#test_script_detail_select_form_submit_btn').html('<b>GO</b>');
+              $('#test_script_detail_select_form_submit_btn').attr('class', 'btn btn-primary');
+              $('#btn_delete_test_script').prop("hidden", false);
+            }
+          });
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+<hr style="width: 90%;">
+
+<script>
+  $("#test_script_detail_select_form_submit_btn").on('click', function(e){
+    $("#test_script_detail_select_form").submit();
+  });
+
+  $("#test_script_detail_select_form").on('submit', function(e){
+    e.preventDefault();
+    loading_screen(true);
+    
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'index_test_script_detail_select_on_selected' %}",
+      dataType: 'json' ,
+      data: $('#test_script_detail_select_form').serialize() + '&' + $('#modal_project_detail_select_form').serialize(),
+      success: function(response){
+        $("#index_test_script_detail_select_html").html(response.index_test_script_detail_select_html);
+        $("#test_case_card_html").html(response.test_case_card_html);
+        loading_screen(false);
+      },
+      error: function(){
+        $("#index_content").html("<h4>Oops! Something went wrong, Please refresh the page and try again.</h4>");
+        loading_screen(false);
+      }
+    });
+  });
+
+  $("#plug_delete_test_script_function").on('click', function(e){
+    e.preventDefault();
+    loading_screen(true);
+
+    $("#modal_new_test_case_card").prop('hidden', true);
+
+    $.ajax({
+      type: 'POST',
+      url: "{% url 'delete_test_script_detail' %}",
+      dataType: 'json',
+      data: $('#test_script_detail_select_form').serialize() + '&' + $('#modal_project_detail_select_form').serialize(),
+      success: function(response){
+        $("#index_test_script_detail_select_html").html(response.index_test_script_detail_select_html);
+        $("#test_case_card_html").html("");
+        loading_screen(false);
+      },
+      error: function(){
+        $("#index_content").html("<h4>Oops! Something went wrong, Please refresh the page and try again.</h4>");
+        loading_screen(false);
+      }
+    });
+  });
+</script>
